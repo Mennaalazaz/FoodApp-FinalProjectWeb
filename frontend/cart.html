@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Shopping Cart</title>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+      <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()"
+        >×</a
+      >
+      <img
+        src="./assets/FOODIES Logo.png"
+        alt="FOODIES Logo"
+        class="sidebar-logo"
+      />
+      <a href="Home.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="cart.html">Cart</a>
+      <a href="trackMyOrder.html">Track Your Order</a>
+      <a href="order-history.html">Order History</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+
+    <header>
+      <button class="open-btn" onclick="openSidebar()">☰</button>
+    </header>
+
+    <!-- Cart Section -->
+    <section class="cart-container">
+      <h1>Your Shopping Cart</h1>
+
+      <div class="cart-items">
+        <!-- Cart items will be loaded dynamically -->
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="cart-summary">
+        <!-- Cart summary will be loaded dynamically -->
+      </div>
+    </section>
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="footer-about">
+          <h3>About Us</h3>
+          <p>
+            We bring delicious meals from your favorite restaurants straight to
+            your door. Fast, fresh, and reliable.
+          </p>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact</h3>
+          <p>Email: support@foodies.com</p>
+          <p>Phone: +20 123 456 789</p>
+          <p>Address: Alexandria, Egypt</p>
+        </div>
+      </div>
+
+      <p class="footer-bottom">© 2025 Foodies. All rights reserved.</p>
+    </footer>
+
+    <script src="index.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        loadCartItems();
+        updateCartCount();
+      });
+
+      function loadCartItems() {
+        const cartKey = getCartKey();
+        const cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+        const cartItemsContainer = document.querySelector(".cart-items");
+        const cartSummaryContainer = document.querySelector(".cart-summary");
+
+        if (cart.length === 0) {
+          cartItemsContainer.innerHTML =
+            '<p style="text-align: center;">Your cart is empty.</p>';
+          cartSummaryContainer.innerHTML = "";
+          return;
+        }
+
+        // Display cart items
+        cartItemsContainer.innerHTML = cart
+          .map(
+            (item) => `
+          <div class="cart-item">
+            <h4>${item.name}</h4>
+            <div class="quantity-controls">
+              <button onclick="decreaseQuantity(${item.id})">-</button>
+              <span>Quantity: ${item.quantity}</span>
+              <button onclick="increaseQuantity(${item.id})">+</button>
+            </div>
+            <p>Price: ${item.price} EGP each</p>
+            <p>Total: ${item.price * item.quantity} EGP</p>
+            <button onclick="removeFromCart(${item.id})">Remove</button>
+          </div>
+        `
+          )
+          .join("");
+
+        // Calculate and display summary
+        const total = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        cartSummaryContainer.innerHTML = `
+          <h3>Cart Summary</h3>
+          <p>Total Items: ${cart.reduce(
+            (sum, item) => sum + item.quantity,
+            0
+          )}</p>
+          <p><strong>Total Price: ${total} EGP</strong></p>
+          <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+        `;
+      }
+
+      function removeFromCart(foodId) {
+        const cartKey = getCartKey();
+        let cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+        cart = cart.filter((item) => item.id !== foodId);
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+        loadCartItems();
+        updateCartCount();
+      }
+
+      function proceedToCheckout() {
+        window.location.href = "checkout.html";
+      }
+
+      function increaseQuantity(foodId) {
+        const cartKey = getCartKey();
+        let cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+        const item = cart.find((item) => item.id === foodId);
+        if (item) {
+          item.quantity += 1;
+          localStorage.setItem(cartKey, JSON.stringify(cart));
+          loadCartItems();
+          updateCartCount();
+        }
+      }
+
+      function decreaseQuantity(foodId) {
+        const cartKey = getCartKey();
+        let cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+        const item = cart.find((item) => item.id === foodId);
+        if (item) {
+          item.quantity -= 1;
+          if (item.quantity <= 0) {
+            cart = cart.filter((item) => item.id !== foodId);
+          }
+          localStorage.setItem(cartKey, JSON.stringify(cart));
+          loadCartItems();
+          updateCartCount();
+        }
+      }
+    </script>
+  </body>
+</html>

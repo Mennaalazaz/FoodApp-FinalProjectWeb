@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Sign Up - Foodies</title>
+</head>
+<body class="loginPage">
+
+    <!-- Logo Section -->
+    <div class="login-logo">
+        <img src="./assets/FOODIES Logo.png" alt="FOODIES Logo">
+    </div>
+
+    <!-- Sign Up Container -->
+    <div class="signup-container">
+        <h2>Create Account</h2>
+        <form id="signupForm">
+            <input type="text" id="username" placeholder="Full Name" required minlength="3">
+            
+            <input type="email" id="email" placeholder="Email Address" required 
+                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                   title="Please enter a valid email address (example@email.com)">
+            
+            <input type="password" id="password" placeholder="Password" required minlength="6"
+                   title="Password must be at least 6 characters">
+            
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required minlength="6">
+            
+            <input type="tel" id="phone" placeholder="Phone Number" required 
+                   pattern="[0-9]{11}"
+                   title="Please enter 11 digit phone number">
+            
+            <input type="text" id="location" placeholder="Location (City, Area)" required minlength="3">
+            
+            <button type="submit">Sign Up</button>
+        </form>
+        <div class="login-footer">
+            Already have an account? <a href="index.html">Sign In</a>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>

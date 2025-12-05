@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Foodies Menu</title>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+      <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()"
+        >×</a
+      >
+      <img
+        src="./assets/FOODIES Logo.png"
+        alt="FOODIES Logo"
+        class="sidebar-logo"
+      />
+      <a href="Home.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="cart.html">Cart</a>
+      <a href="trackMyOrder.html">Track Your Order</a>
+      <a href="order-history.html">Order History</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+
+    <header>
+      <button class="open-btn" onclick="openSidebar()">☰</button>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero">
+      <h1>Explore Our Delicious Menu</h1>
+      <p>Choose from a variety of categories and enjoy your favorite dishes</p>
+    </section>
+
+    <div class="search">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="  Search Your Favourite Food..."
+      />
+      <button id="searchButton">Search</button>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="category-tabs" id="categoryTabs">
+      <!-- Categories will be loaded dynamically -->
+    </div>
+
+    <!-- Menu Items Grid -->
+    <div id="menu-items" class="menu-grid">
+      <!-- Menu items will be loaded dynamically -->
+    </div>
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="footer-about">
+          <h3>About Us</h3>
+          <p>
+            We bring delicious meals from your favorite restaurants straight to
+            your door. Fast, fresh, and reliable.
+          </p>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact</h3>
+          <p>Email: support@foodies.com</p>
+          <p>Phone: +20 123 456 789</p>
+          <p>Address: Alexandria, Egypt</p>
+        </div>
+      </div>
+
+      <p class="footer-bottom">© 2025 Foodies. All rights reserved.</p>
+    </footer>
+
+    <script src="index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Checkout</title>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+      <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()"
+        >×</a
+      >
+      <img
+        src="./assets/FOODIES Logo.png"
+        alt="FOODIES Logo"
+        class="sidebar-logo"
+      />
+      <a href="Home.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="cart.html">Cart</a>
+      <a href="trackMyOrder.html">Track Your Order</a>
+      <a href="order-history.html">Order History</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+
+    <header>
+      <button class="open-btn" onclick="openSidebar()">☰</button>
+    </header>
+
+    <!-- Checkout Section -->
+    <section class="checkout-container">
+      <h1>Checkout</h1>
+
+      <!-- Customer Info -->
+      <form class="checkout-form" id="checkoutForm">
+        <h2>Customer Information</h2>
+        <input type="text" id="customerName" placeholder="Full Name" required />
+        <input
+          type="email"
+          id="customerEmail"
+          placeholder="Email Address"
+          required
+        />
+        <input
+          type="tel"
+          id="customerPhone"
+          placeholder="Phone Number"
+          required
+          pattern="[0-9]{11}"
+        />
+
+        <!-- Delivery Address -->
+        <h2>Delivery Address</h2>
+        <input
+          type="text"
+          id="streetAddress"
+          placeholder="Street Address"
+          required
+        />
+        <input type="text" id="city" placeholder="City" required />
+        <input type="text" id="postalCode" placeholder="Postal Code" required />
+
+        <!-- Payment Method -->
+        <h2>Payment Method</h2>
+        <label
+          ><input type="radio" name="payment" value="cash" required /> Cash on
+          Delivery</label
+        >
+        <label
+          ><input type="radio" name="payment" value="card" /> Credit/Debit
+          Card</label
+        >
+        <label
+          ><input type="radio" name="payment" value="wallet" /> Mobile
+          Wallet</label
+        >
+
+        <!-- Order Summary -->
+        <h2>Order Summary</h2>
+        <div class="order-summary" id="orderSummary">
+          <!-- Order summary will be loaded dynamically -->
+        </div>
+
+        <!-- Checkout Button -->
+        <button type="submit" class="checkout-btn">Place Order</button>
+      </form>
+    </section>
+
+    <!-- Order Confirmation Modal -->
+    <div id="orderConfirmModal" class="review-modal">
+      <div class="review-modal-content">
+        <h2>🎉 Order Placed Successfully!</h2>
+        <p id="orderNumberDisplay">Order #<span id="orderNumber"></span></p>
+        <p>Your order is being prepared</p>
+        <button class="theme-btn" onclick="goToTrackOrder()">
+          Track My Order
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="footer-about">
+          <h3>About Us</h3>
+          <p>
+            We bring delicious meals from your favorite restaurants straight to
+            your door. Fast, fresh, and reliable.
+          </p>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact</h3>
+          <p>Email: support@foodies.com</p>
+          <p>Phone: +20 123 456 789</p>
+          <p>Address: Alexandria, Egypt</p>
+        </div>
+      </div>
+      <p class="footer-bottom">© 2025 Foodies. All rights reserved.</p>
+    </footer>
+
+    <script src="index.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        loadOrderSummary();
+      });
+
+      function loadOrderSummary() {
+        const cartKey = getCartKey();
+        const cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+        const orderSummaryEl = document.getElementById("orderSummary");
+
+        if (cart.length === 0) {
+          orderSummaryEl.innerHTML =
+            "<p>Your cart is empty. Please add items to your cart first.</p>";
+          document.getElementById("checkoutForm").style.display = "none";
+          return;
+        }
+
+        const itemsHtml = cart
+          .map(
+            (item) =>
+              `<p>${item.name} x${item.quantity} — ${
+                item.price * item.quantity
+              } EGP</p>`
+          )
+          .join("");
+        const total = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
+        orderSummaryEl.innerHTML = `
+      ${itemsHtml}
+      <hr>
+      <p><strong>Total: ${total} EGP</strong></p>
+    `;
+      }
+
+      // Override the existing checkout form handler
+      document.addEventListener("DOMContentLoaded", function () {
+        const checkoutForm = document.getElementById("checkoutForm");
+
+        if (checkoutForm) {
+          checkoutForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            // Get form data
+            const customerName = document
+              .getElementById("customerName")
+              .value.trim();
+            const customerEmail = document
+              .getElementById("customerEmail")
+              .value.trim();
+            const customerPhone = document
+              .getElementById("customerPhone")
+              .value.trim();
+            const streetAddress = document
+              .getElementById("streetAddress")
+              .value.trim();
+            const city = document.getElementById("city").value.trim();
+            const postalCode = document
+              .getElementById("postalCode")
+              .value.trim();
+            const paymentMethod = document.querySelector(
+              'input[name="payment"]:checked'
+            );
+
+            // Validate all fields
+            if (
+              !customerName ||
+              !customerEmail ||
+              !customerPhone ||
+              !streetAddress ||
+              !city ||
+              !postalCode
+            ) {
+              alert("⚠️ Please fill in all fields!");
+              return;
+            }
+
+            if (!paymentMethod) {
+              alert("⚠️ Please select a payment method!");
+              return;
+            }
+
+            // Get cart items
+            const cartKey = getCartKey();
+            const cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+            if (cart.length === 0) {
+              alert("⚠️ Your cart is empty!");
+              return;
+            }
+
+            // Prepare order data for API
+            const orderData = {
+              address: `${streetAddress}, ${city}, ${postalCode}`,
+              payment_method: paymentMethod.value,
+              items: cart.map((item) => ({
+                food_id: item.id,
+                quantity: item.quantity,
+              })),
+              total: cart.reduce(
+                (sum, item) => sum + item.price * item.quantity,
+                0
+              ),
+            };
+
+            try {
+              // Call the placeOrder API
+              const response = await placeOrder(orderData);
+
+              // Clear cart after successful order
+              localStorage.removeItem(cartKey);
+
+              // Generate order number for display
+              const orderNumber =
+                response.orderId || Math.floor(10000 + Math.random() * 90000);
+
+              // Show confirmation modal
+              showOrderConfirmation(orderNumber);
+            } catch (error) {
+              console.error("Order placement failed:", error);
+              alert("Failed to place order. Please try again.");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

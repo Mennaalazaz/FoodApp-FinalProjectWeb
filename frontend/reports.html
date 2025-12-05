@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Reports</title>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+      <img
+        src="./assets/FOODIES Logo.png"
+        alt="FOODIES Logo"
+        class="sidebar-logo"
+      />
+      <a href="Dashboard.html">Dashboard</a>
+      <a href="reports.html">Reports</a>
+      <a href="index.html">Sign Out</a>
+      <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()"
+        >×</a
+      >
+    </div>
+
+    <header>
+      <button class="open-btn" onclick="openSidebar()">☰</button>
+    </header>
+
+    <!-- Reports Section -->
+    <section class="dashboard-container">
+      <h1>Reports</h1>
+
+      <!-- Summary Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total Revenue</h3>
+          <p>$12,450</p>
+        </div>
+        <div class="stat-card">
+          <h3>Total Orders</h3>
+          <p>520</p>
+        </div>
+        <div class="stat-card">
+          <h3>Active Customers</h3>
+          <p>310</p>
+        </div>
+        <div class="stat-card">
+          <h3>Top Item</h3>
+          <p>Pepperoni Pizza</p>
+        </div>
+      </div>
+
+      <!-- Reports Table -->
+      <h2>Monthly Performance</h2>
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Total Orders</th>
+            <th>Delivered</th>
+            <th>Cancelled</th>
+            <th>Revenue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>January</td>
+            <td>120</td>
+            <td>115</td>
+            <td>5</td>
+            <td>$2,800</td>
+          </tr>
+          <tr>
+            <td>February</td>
+            <td>95</td>
+            <td>90</td>
+            <td>5</td>
+            <td>$2,100</td>
+          </tr>
+          <tr>
+            <td>March</td>
+            <td>150</td>
+            <td>145</td>
+            <td>5</td>
+            <td>$3,500</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="footer-about">
+          <h3>About Us</h3>
+          <p>
+            We bring delicious meals from your favorite restaurants straight to
+            your door. Fast, fresh, and reliable.
+          </p>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact</h3>
+          <p>Email: support@foodies.com</p>
+          <p>Phone: +20 123 456 789</p>
+          <p>Address: Alexandria, Egypt</p>
+        </div>
+      </div>
+      <p class="footer-bottom">© 2025 Foodies. All rights reserved.</p>
+    </footer>
+
+    <script src="index.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        await loadReportData();
+      });
+
+      async function loadReportData() {
+        try {
+          const restaurantId = localStorage.getItem("restaurantId");
+          if (!restaurantId) {
+            console.error("No restaurant ID found");
+            return;
+          }
+
+          const reportData = await getMonthlyReport(restaurantId);
+
+          // Update summary cards
+          document.querySelector(
+            ".stat-card:nth-child(1) p"
+          ).textContent = `$${reportData.totalSales.toFixed(2)}`;
+          document.querySelector(".stat-card:nth-child(2) p").textContent =
+            reportData.totalOrders;
+          document.querySelector(".stat-card:nth-child(3) p").textContent =
+            reportData.uniqueUsers;
+          document.querySelector(".stat-card:nth-child(4) p").textContent =
+            reportData.mostOrderedItems.length > 0
+              ? reportData.mostOrderedItems[0].name
+              : "N/A";
+        } catch (error) {
+          console.error("Error loading report data:", error);
+          // Optionally show user-friendly error message
+          alert("Failed to load report data. Please try again later.");
+        }
+      }
+    </script>
+  </body>
+</html>

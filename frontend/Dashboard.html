@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Admin Dashboard</title>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+      <img
+        src="./assets/FOODIES Logo.png"
+        alt="FOODIES Logo"
+        class="sidebar-logo"
+      />
+      <a href="Dashboard.html">Dashboard</a>
+      <a href="reports.html">Reports</a>
+      <a href="index.html">Sign Out</a>
+      <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()"
+        >×</a
+      >
+    </div>
+
+    <header>
+      <button class="open-btn" onclick="openSidebar()">☰</button>
+    </header>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard-container">
+      <h1>Admin Dashboard</h1>
+
+      <!-- Quick Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total Orders</h3>
+          <p id="totalOrders">Loading...</p>
+        </div>
+        <div class="stat-card">
+          <h3>Pending Orders</h3>
+          <p id="pendingOrders">Loading...</p>
+        </div>
+        <div class="stat-card">
+          <h3>Delivered Orders</h3>
+          <p id="deliveredOrders">Loading...</p>
+        </div>
+        <div class="stat-card">
+          <h3>Revenue</h3>
+          <p id="revenue">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Orders Table -->
+      <h2>Manage Orders</h2>
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTableBody">
+          <tr>
+            <td colspan="6">Loading orders...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="footer-about">
+          <h3>About Us</h3>
+          <p>
+            We bring delicious meals from your favorite restaurants straight to
+            your door. Fast, fresh, and reliable.
+          </p>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact</h3>
+          <p>Email: support@foodies.com</p>
+          <p>Phone: +20 123 456 789</p>
+          <p>Address: Alexandria, Egypt</p>
+        </div>
+      </div>
+      <p class="footer-bottom">© 2025 Foodies. All rights reserved.</p>
+    </footer>
+
+    <script src="index.js"></script>
+    <script>
+      // Dashboard specific functions
+      document.addEventListener("DOMContentLoaded", function () {
+        // Check if user is restaurant
+        const userType = localStorage.getItem("userType");
+        if (userType !== "restaurant") {
+          alert("Access denied. Only restaurants can access this page.");
+          window.location.href = "index.html";
+          return;
+        }
+
+        const restaurantId = localStorage.getItem("restaurantId");
+        if (!restaurantId) {
+          alert("Restaurant ID not found. Please login again.");
+          window.location.href = "index.html";
+          return;
+        }
+
+        loadDashboardStats(restaurantId);
+        loadDashboardOrders(restaurantId);
+
+        // Auto-refresh data every 30 seconds
+        setInterval(() => {
+          loadDashboardStats(restaurantId);
+          loadDashboardOrders(restaurantId);
+        }, 30000);
+      });
+
+      let allOrders = [];
+
+      async function loadDashboardStats(restaurantId) {
+        try {
+          const stats = await getRestaurantStats(restaurantId);
+          const orders = await getRestaurantOrdersDashboard(restaurantId);
+          allOrders = orders;
+
+          const deliveredOrders = orders.filter(
+            (order) => order.status === "delivered"
+          ).length;
+          const pendingOrders = orders.filter((order) =>
+            ["pending", "confirmed", "preparing", "ready"].includes(
+              order.status
+            )
+          ).length;
+
+          document.getElementById("totalOrders").textContent =
+            stats.totalOrders;
+          document.getElementById("pendingOrders").textContent = pendingOrders;
+          document.getElementById("deliveredOrders").textContent =
+            deliveredOrders;
+          document.getElementById(
+            "revenue"
+          ).textContent = `$${stats.totalSales.toFixed(2)}`;
+        } catch (error) {
+          console.error("Error loading stats:", error);
+          document.getElementById("totalOrders").textContent = "Error";
+          document.getElementById("pendingOrders").textContent = "Error";
+          document.getElementById("deliveredOrders").textContent = "Error";
+          document.getElementById("revenue").textContent = "Error";
+        }
+      }
+
+      async function loadDashboardOrders(restaurantId) {
+        try {
+          const orders = await getRestaurantOrdersDashboard(restaurantId);
+          displayOrders(orders);
+        } catch (error) {
+          console.error("Error loading orders:", error);
+          document.getElementById("ordersTableBody").innerHTML =
+            '<tr><td colspan="6">Error loading orders</td></tr>';
+        }
+      }
+
+      function displayOrders(orders) {
+        const tbody = document.getElementById("ordersTableBody");
+
+        if (orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6">No orders found</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = orders
+          .map((order) => {
+            const items = order.Order_Items.map(
+              (item) => `${item.Food.Name} x${item.Quantity}`
+            ).join(", ");
+            const statusClass = getStatusClass(order.status);
+            const statusText = getStatusText(order.status);
+
+            return `
+            <tr>
+              <td>#${order.Order_ID}</td>
+              <td>${order.User.username}</td>
+              <td>${items}</td>
+              <td>$${order.Price}</td>
+              <td><span class="status ${statusClass}">${statusText}</span></td>
+              <td>
+                ${
+                  order.status === "pending"
+                    ? `<button class="theme-btn" onclick="updateOrderStatus(${order.Order_ID}, 'confirmed')">Confirm Order</button>`
+                    : ""
+                }
+                ${
+                  order.status === "confirmed"
+                    ? `<button class="theme-btn" onclick="updateOrderStatus(${order.Order_ID}, 'preparing')">Mark Preparing</button>`
+                    : ""
+                }
+                ${
+                  order.status === "preparing"
+                    ? `<button class="theme-btn" onclick="updateOrderStatus(${order.Order_ID}, 'ready')">Mark Ready</button>`
+                    : ""
+                }
+                ${
+                  order.status === "ready"
+                    ? `<button class="theme-btn" onclick="updateOrderStatus(${order.Order_ID}, 'delivered')">Mark Delivered</button>`
+                    : ""
+                }
+                ${
+                  ["pending", "confirmed", "preparing", "ready"].includes(
+                    order.status
+                  )
+                    ? `<button class="theme-btn secondary" onclick="updateOrderStatus(${order.Order_ID}, 'cancelled')">Cancel</button>`
+                    : ""
+                }
+                ${
+                  order.status === "delivered"
+                    ? `<button class="theme-btn" onclick="viewOrderDetails(${order.Order_ID})">View</button>`
+                    : ""
+                }
+              </td>
+            </tr>
+          `;
+          })
+          .join("");
+      }
+
+      function getStatusClass(status) {
+        switch (status) {
+          case "pending":
+            return "pending";
+          case "confirmed":
+            return "confirmed";
+          case "preparing":
+            return "preparing";
+          case "ready":
+            return "ready";
+          case "delivered":
+            return "delivered";
+          case "cancelled":
+            return "cancelled";
+          default:
+            return "pending";
+        }
+      }
+
+      function getStatusText(status) {
+        switch (status) {
+          case "pending":
+            return "Pending";
+          case "confirmed":
+            return "Confirmed";
+          case "preparing":
+            return "Preparing";
+          case "ready":
+            return "Ready";
+          case "delivered":
+            return "Delivered";
+          case "cancelled":
+            return "Cancelled";
+          default:
+            return "Pending";
+        }
+      }
+
+      async function updateOrderStatus(orderId, status) {
+        try {
+          await updateOrderStatusDashboard(orderId, status);
+          alert("Order status updated successfully!");
+          // Reload orders and stats
+          const restaurantId = localStorage.getItem("restaurantId");
+          loadDashboardOrders(restaurantId);
+          loadDashboardStats(restaurantId);
+        } catch (error) {
+          console.error("Error updating order status:", error);
+          alert("Error updating order status: " + error.message);
+        }
+      }
+
+      function viewOrderDetails(orderId) {
+        // Find the order from allOrders
+        const order = allOrders.find((o) => o.Order_ID === orderId);
+        if (!order) {
+          alert("Order not found");
+          return;
+        }
+
+        const items = order.Order_Items.map(
+          (item) => `${item.Food.Name} x${item.Quantity} - $${item.Subtotal}`
+        ).join("\n");
+
+        const details = `
+Order ID: #${order.Order_ID}
+Customer: ${order.User.username}
+Email: ${order.User.email}
+Phone: ${order.User.phone}
+Address: ${order.address}
+Status: ${getStatusText(order.status)}
+Total: $${order.Price}
+Payment Method: ${order.Payment_Method}
+
+Items:
+${items}
+
+Order Date: ${new Date(order.CreatedAt).toLocaleString()}
+        `;
+
+        alert(details);
+      }
+    </script>
+  </body>
+</html>

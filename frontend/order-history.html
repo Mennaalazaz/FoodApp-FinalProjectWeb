@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Order History</title>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+      <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()"
+        >×</a
+      >
+      <img
+        src="./assets/FOODIES Logo.png"
+        alt="FOODIES Logo"
+        class="sidebar-logo"
+      />
+      <a href="Home.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="cart.html">Cart</a>
+      <a href="trackMyOrder.html">Track Your Order</a>
+      <a href="order-history.html">Order History</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+    <header>
+      <button class="open-btn" onclick="openSidebar()">☰</button>
+    </header>
+
+    <!-- Order History Section -->
+    <section class="order-history-container">
+      <h1 class="order-history-title">Order History</h1>
+
+      <div id="loading" class="loading">Loading your orders...</div>
+      <div id="error" class="error" style="display: none"></div>
+
+      <div
+        class="order-table-wrapper"
+        id="orderTableWrapper"
+        style="display: none"
+      >
+        <table class="order-table" id="orderTable">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Total Amount</th>
+              <th>Order Date</th>
+              <th>Status</th>
+              <th>Items Ordered</th>
+            </tr>
+          </thead>
+          <tbody id="orderTableBody">
+            <!-- Dynamic rows will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="footer-about">
+          <h3>About Us</h3>
+          <p>
+            We bring delicious meals from your favorite restaurants straight to
+            your door. Fast, fresh, and reliable.
+          </p>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact</h3>
+          <p>Email: support@foodies.com</p>
+          <p>Phone: +20 123 456 789</p>
+          <p>Address: Alexandria, Egypt</p>
+        </div>
+      </div>
+      <p class="footer-bottom">© 2025 Foodies. All rights reserved.</p>
+    </footer>
+
+    <script src="index.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        const loadingEl = document.getElementById("loading");
+        const errorEl = document.getElementById("error");
+        const tableWrapperEl = document.getElementById("orderTableWrapper");
+        const tableEl = document.getElementById("orderTable");
+        const tbodyEl = document.getElementById("orderTableBody");
+
+        try {
+          // Get user ID from localStorage or token (assuming token contains user info)
+          const token = localStorage.getItem("token");
+          if (!token) {
+            errorEl.textContent = "Please log in to view your order history.";
+            errorEl.style.display = "block";
+            loadingEl.style.display = "none";
+            return;
+          }
+
+          // Decode token to get user ID (simple decode, adjust if needed)
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          const userId = payload.id;
+
+          // Fetch orders
+          const orders = await getUserOrders(userId);
+
+          loadingEl.style.display = "none";
+
+          if (orders.length === 0) {
+            errorEl.textContent = "No orders found.";
+            errorEl.style.display = "block";
+            return;
+          }
+
+          // Display orders with animation
+          orders.forEach(async (order, index) => {
+            const row = document.createElement("tr");
+            row.style.opacity = "0";
+            row.style.transform = "translateY(20px)";
+            row.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+
+            const itemsText = order.Order_Items.map(
+              (item) => `${item.Food.Name} x${item.Quantity}`
+            ).join(", ");
+
+            // Fetch real-time status
+            let statusText = order.status;
+            try {
+              const statusResponse = await getOrderStatus(order.Order_ID);
+              statusText = statusResponse.status;
+            } catch (error) {
+              console.error(
+                `Error fetching status for order ${order.Order_ID}:`,
+                error
+              );
+              // Keep original status as fallback
+            }
+
+            row.innerHTML = `
+              <td>${order.Order_ID}</td>
+              <td>${order.Price} EGP</td>
+              <td>${new Date(order.CreatedAt).toLocaleDateString()}</td>
+              <td><span class="status-badge status-${statusText.toLowerCase()}">${statusText}</span></td>
+              <td>${itemsText}</td>
+            `;
+
+            tbodyEl.appendChild(row);
+
+            // Animate row appearance
+            setTimeout(() => {
+              row.style.opacity = "1";
+              row.style.transform = "translateY(0)";
+            }, index * 100);
+          });
+
+          tableWrapperEl.style.display = "block";
+          // Animate table appearance
+          setTimeout(() => {
+            tableWrapperEl.style.opacity = "1";
+            tableWrapperEl.style.transform = "translateY(0)";
+          }, 200);
+        } catch (error) {
+          console.error("Error loading order history:", error);
+          errorEl.textContent =
+            "Failed to load order history. Please try again.";
+          errorEl.style.display = "block";
+          loadingEl.style.display = "none";
+        }
+      });
+    </script>
+  </body>
+</html>

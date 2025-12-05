@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+  <title>Track My Order</title>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="mySidebar" class="sidebar">
+  <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()">×</a>
+  <img src="./assets/FOODIES Logo.png" alt="FOODIES Logo" class="sidebar-logo">
+  <a href="Home.html">Home</a>
+  <a href="menu.html">Menu</a>
+  <a href="cart.html">Cart</a>
+  <a href="trackMyOrder.html">Track Your Order</a>
+  <a href="order-history.html">Order History</a>
+  <a href="index.html">Sign Out</a>
+</div>
+
+<header>
+  <button class="open-btn" onclick="openSidebar()">☰</button>
+</header>
+
+<!-- Track Order Section -->
+<section class="track-container">
+  <h1>Track Your Order</h1>
+
+  <!-- Order Info -->
+  <div class="order-info">
+    <p><strong id="orderNumberDisplay">Order #12345</strong></p>
+    <p id="deliveryTime">Estimated Delivery: 30 minutes</p>
+    <p id="orderItems">Items: Pepperoni Pizza, Classic Burger</p>
+    <p id="deliveryAddress" style="color: #666; font-size: 14px;"></p>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar">
+    <div class="step" data-step="0">
+      <span>Order Placed</span>
+      <div class="step-icon">✓</div>
+    </div>
+    <div class="step" data-step="1">
+      <span>Preparing</span>
+      <div class="step-icon">🍳</div>
+    </div>
+    <div class="step" data-step="2">
+      <span>Out for Delivery</span>
+      <div class="step-icon">🚗</div>
+    </div>
+    <div class="step" data-step="3">
+      <span>Delivered</span>
+      <div class="step-icon">🎉</div>
+    </div>
+  </div>
+
+  <!-- Test Buttons (for demonstration) -->
+  <div style="text-align: center; margin-top: 20px;">
+    <button class="theme-btn" onclick="simulateOrderProgress()">Simulate Order Progress</button>
+  </div>
+</section>
+
+<!-- Review Modal (Hidden by default) -->
+<div id="reviewModal" class="review-modal">
+  <div class="review-modal-content">
+    <h2>🎉 Order Delivered!</h2>
+    <p>How was your experience?</p>
+    
+    <!-- Star Rating -->
+    <div class="stars" id="starRating">
+      <span class="star" data-rating="1">★</span>
+      <span class="star" data-rating="2">★</span>
+      <span class="star" data-rating="3">★</span>
+      <span class="star" data-rating="4">★</span>
+      <span class="star" data-rating="5">★</span>
+    </div>
+    <p id="ratingText">Select your rating</p>
+    
+    <!-- Review Text -->
+    <textarea id="reviewText" placeholder="Write your review here (optional)..." rows="4"></textarea>
+    
+    <!-- Buttons -->
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+      <button class="theme-btn" onclick="submitReview()">Submit Review</button>
+      <button class="theme-btn secondary" onclick="skipReview()">Skip</button>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-about">
+      <h3>About Us</h3>
+      <p>We bring delicious meals from your favorite restaurants straight to your door. Fast, fresh, and reliable.</p>
+    </div>
+    <div class="footer-contact">
+      <h3>Contact</h3>
+      <p>Email: support@foodies.com</p>
+      <p>Phone: +20 123 456 789</p>
+      <p>Address: Alexandria, Egypt</p>
+    </div>
+  </div>
+  <p class="footer-bottom">© 2025 Foodies. All rights reserved.</p>
+</footer>
+
+<script src="index.js"></script>
+</body>
+</html>
