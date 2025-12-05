@@ -424,7 +424,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Signup failed");
+        alert(data.error || "Signup failed");
         return;
       }
 
